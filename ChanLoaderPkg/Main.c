@@ -38,38 +38,90 @@ EFI_STATUS GetMemoryMap(struct MemoryMap* map) {
       &map->descriptor_version);
 }
 
+const CHAR16* GetMemoryTypeUnicode(EFI_MEMORY_TYPE type) {
+  switch (type) {
+     case EfiReservedMemoryType: return L"EfiReservedMemoryType";
+     case EfiLoaderCode: return L"EfiLoaderCode";
+     case EfiLoaderData: return L"EfiLoaderData";
+     case EfiBootServicesCode: return L"EfiBootServicesCode";
+     case EfiBootServicesData: return L"EfiBootServicesData";
+     case EfiRuntimeServicesCode: return L"EfiRuntimeServicesCode";
+     case EfiRuntimeServicesData: return L"EfiRuntimeServicesData";
+     case EfiConventionalMemory: return L"EfiConventionalMemory";
+     case EfiUnusableMemory: return L"EfiUnusableMemory";
+     case EfiACPIReclaimMemory: return L"EfiACPIReclaimMemory";
+     case EfiACPIMemoryNVS: return L"EfiACPIMemoryNVS";
+     case EfiMemoryMappedIO: return L"EfiMemoryMappedIO";
+     case EfiMemoryMappedIOPortSpace: return L"EfiMemoryMappedIOPortSpace";
+     case EfiPalCode: return L"EfiPalCode";
+     case EfiPersistentMemory: return L"EfiPersistentMemory";
+     case EfiMaxMemoryType: return L"EfiMaxMemoryType";
+     default: return L"InvalidMemoryType";
+   }
+}
+
 // AsciiStrLen() ... Returns the length of a Null-terminated ASCII string.
 // EFI_PHYSICAL_ADDRESS ... 64-bit physical memory address.
 // AsciiSPrint ... Like C's "sprintf".
 
 EFI_STATUS SaveMemoryMap(struct MemoryMap* map, EFI_FILE_PROTOCOL* file){
-	CHAR8 buf[256];
-	UINTN len;
+  CHAR8 buf[256];
+  UINTN len;
 
-	CHAR8* header =
-          "Index, Type, Type(name), PhisicalStart, NumberOsPages, Attribute\n";
-	len = AsciiStrLen(header);
-	file->Write(file, &len, header);
+  CHAR8* header =
+    "Index, Type, Type(name), PhisicalStart, NumberOsPages, Attribute\n";
+  len = AsciiStrLen(header);
+  file->Write(file, &len, header);
 
-	Print(L"map->buffer = %081x, map->map_size = %081x\n",
-	    map->buffer, map->map_size);
+  Print(L"map->buffer = %081x, map->map_size = %081x\n",
+      map->buffer, map->map_size);
 
-	EFI_PHYSICAL_ADDRESS iter;
-	int i;
-	for ( iter = (EFI_PHISICAL_ADDRESS)map->buffer, i = 0;
-	      iter < (EFI_PHISICAL_ADDRESS)map->buffer + map->map_size;
-	      iter += map->descriptor_size, i++) {
-	  EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)iter;
-	  len = AsciiSPrint(
-	     buf, sizeof(buf),
-	     "%u, %x, %-ls, %081x, %lx, %lx\n",
-	     i, desc->Type, GetMemoryTypeUnicode(desc->Type),
-	     desc->PhysicalStart, desc->NumberOfPages,
-	     desc->Attribute & 0xffffflu);
-	  file->Write(file, &len, buf);
-        }
+  EFI_PHYSICAL_ADDRESS iter;
+  int i;
+  for ( iter = (EFI_PHISICAL_ADDRESS)map->buffer, i = 0;
+        iter < (EFI_PHISICAL_ADDRESS)map->buffer + map->map_size;
+	iter += map->descriptor_size, i++) {
+    EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)iter;
+    len = AsciiSPrint(
+        buf, sizeof(buf),
+	"%u, %x, %-ls, %081x, %lx, %lx\n",
+	i, desc->Type, GetMemoryTypeUnicode(desc->Type),
+	desc->PhysicalStart, desc->NumberOfPages,
+	desc->Attribute & 0xffffflu);
+     file->Write(file, &len, buf);
+   }
 
-	return EFI_SUCCESS;
+  return EFI_SUCCESS;
+}
+
+// EFI_LOADED_IMAGE_PROTOCOL ... Can be used on any image handle to obtain information about the loaded image.
+// EFI_SIMPLE_FILE_SYSTEM_PROTOCOL ... the programmatic access to the FAT (12,16,32) file system specified in 
+//    UEFI 2.0. 
+// gBS->OpenProtocol ... https://edk2-docs.gitbook.io/edk-ii-uefi-driver-writer-s-guide/5_uefi_services/51_services_that_uefi_drivers_commonly_use/513_handle_database_and_protocol_services#example-38-openprotocol-function-prototype
+
+EFI_STATUS OpenRootDir(EFI_HANDLE image_handle, EFI_FILE_PROTOCOL** root) {
+  EFI_LOADED_IMAGE_PROTOCOL* loaded_image;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL* fs;
+
+  gBS->OpenProtocol(
+      image_handle,
+      &gEfiLoadedImageProtocolGuid,
+      (VOID**)&loaded_image,
+      image_handle,
+      NULL,
+      EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+
+  gBS->OpenProtocol(
+      loaded_image->DeviceHandle,
+      &gEfiSimpleFileSystemProtocolGuid,
+      (VOID**)&fs,
+      image_handle,
+      NULL,
+      EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+
+  fs->OpenVolume(fs, root);
+
+  return EFI_SUCCESS;
 }
 
 // EFIAPI ...  
