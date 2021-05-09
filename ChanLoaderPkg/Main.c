@@ -1,5 +1,11 @@
 #include <Uefi.h>
 #include <Library/UefiLib.h>
+#include  <Library/UefiBootServicesTableLib.h>
+#include  <Library/PrintLib.h>
+#include  <Protocol/LoadedImage.h>
+#include  <Protocol/SimpleFileSystem.h>
+#include  <Protocol/DiskIo2.h>
+#include  <Protocol/BlockIo.h>
 
 // UINTN ... Unsigned value of native width.
 // gBS ... Global variable representing the boot service.
@@ -20,8 +26,8 @@ struct MemoryMap {
   VOID* buffer;
   UINTN map_size;
   UINTN map_key;
-  UINTN desciptor_size;
-  UINT32 desciptor_version;
+  UINTN descriptor_size;
+  UINT32 descriptor_version;
 };
 
 EFI_STATUS GetMemoryMap(struct MemoryMap* map) {
@@ -32,7 +38,7 @@ EFI_STATUS GetMemoryMap(struct MemoryMap* map) {
   map->map_size = map->buffer_size;
   return gBS->GetMemoryMap(
       &map->map_size,
-      (EFI_MEMORY_DESCRIPTER*)map->buffer,
+      (EFI_MEMORY_DESCRIPTOR*)map->buffer,
       &map->map_key,
       &map->descriptor_size,
       &map->descriptor_version);
@@ -63,6 +69,8 @@ const CHAR16* GetMemoryTypeUnicode(EFI_MEMORY_TYPE type) {
 // AsciiStrLen() ... Returns the length of a Null-terminated ASCII string.
 // EFI_PHYSICAL_ADDRESS ... 64-bit physical memory address.
 // AsciiSPrint ... Like C's "sprintf".
+// desc->Attribute ... Attributes of the memory region that describe the bit mask of capabilities for that memory region, and not necessarily the current settings for that memory region.
+// lu ... unsigned long.
 
 EFI_STATUS SaveMemoryMap(struct MemoryMap* map, EFI_FILE_PROTOCOL* file){
   CHAR8 buf[256];
@@ -78,20 +86,20 @@ EFI_STATUS SaveMemoryMap(struct MemoryMap* map, EFI_FILE_PROTOCOL* file){
 
   EFI_PHYSICAL_ADDRESS iter;
   int i;
-  for ( iter = (EFI_PHISICAL_ADDRESS)map->buffer, i = 0;
-        iter < (EFI_PHISICAL_ADDRESS)map->buffer + map->map_size;
-	iter += map->descriptor_size, i++) {
-    EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)iter;
-    len = AsciiSPrint(
-        buf, sizeof(buf),
-	"%u, %x, %-ls, %081x, %lx, %lx\n",
-	i, desc->Type, GetMemoryTypeUnicode(desc->Type),
-	desc->PhysicalStart, desc->NumberOfPages,
-	desc->Attribute & 0xffffflu);
-     file->Write(file, &len, buf);
+  for ( iter = (EFI_PHYSICAL_ADDRESS)map->buffer, i = 0;
+        iter < (EFI_PHYSICAL_ADDRESS)map->buffer + map->map_size;
+	      iter += map->descriptor_size, i++) {
+          EFI_MEMORY_DESCRIPTOR* desc = (EFI_MEMORY_DESCRIPTOR*)iter;
+          len = AsciiSPrint(
+                  buf, sizeof(buf),
+                	"%u, %x, %-ls, %081x, %lx, %lx\n",
+                	i, desc->Type, GetMemoryTypeUnicode(desc->Type),
+                	desc->PhysicalStart, desc->NumberOfPages,
+                	desc->Attribute & 0xffffflu);
+          file->Write(file, &len, buf);
    }
 
-  return EFI_SUCCESS;
+   return EFI_SUCCESS;
 }
 
 // EFI_LOADED_IMAGE_PROTOCOL ... Can be used on any image handle to obtain information about the loaded image.
