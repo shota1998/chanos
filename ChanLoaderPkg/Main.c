@@ -140,7 +140,8 @@ EFI_STATUS OpenRootDir(EFI_HANDLE image_handle, EFI_FILE_PROTOCOL** root) {
 // EFI_FILE_PROTOCOL ... Provides file IO access to supported file systems.
 // root_dir->Open ... Make "memmap" file at root dir.
 // SaveMemoryMap ... Save memmap to " ~/memmap ".
-// kernel_file->GetInfo() ... EFI_FILE_INFO will be written in file_info_buffer.
+// kernel_file->GetInfo() ... EFI_FILE_INFO will be written in file_info_buffer
+// %r ... 
 
 EFI_STATUS EFIAPI UefiMain(
     EFI_HANDLE image_handle,
@@ -184,6 +185,27 @@ EFI_STATUS EFIAPI UefiMain(
   kernel_file->Read(kernel_file, &kernel_file_size, (VOID*)kernel_base_addr);
   Print(L"Kernel: 0x%0lx (%lu bytes)\n", kernel_base_addr, kernel_file_size);
   // #@@range_end(read_kernel)
+
+  // #@@range_begin(exit_bs)
+  EFI_STATUS status;
+  status = gBS->ExitBootServices(image_handle, memmap.map_key);
+  if (EFI_ERROR(status)) {
+    status = GetMemoryMap(&memmap);
+    if (EFI_ERROR(status)) {
+      Print(L"failed to get memory map: %r\n", status);
+      whlie(1);
+    }
+    status = gBS->ExitBootServices(image_handle, memmap.map_key);
+    if (EFI_ERROR(status)) {
+      Print(L"Could not exit boot services: %r\n", status);
+      while(1);
+    }
+  }
+  // #@@range_end(exit_bs)
+
+  // #@@range_begin(call_kernel)
+
+  // #@@range_end(call_kernel)
 
   Print(L"All done\n");
 
