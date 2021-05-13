@@ -1,11 +1,12 @@
 #include <Uefi.h>
 #include <Library/UefiLib.h>
-#include  <Library/UefiBootServicesTableLib.h>
-#include  <Library/PrintLib.h>
-#include  <Protocol/LoadedImage.h>
-#include  <Protocol/SimpleFileSystem.h>
-#include  <Protocol/DiskIo2.h>
-#include  <Protocol/BlockIo.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/PrintLib.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/SimpleFileSystem.h>
+#include <Protocol/DiskIo2.h>
+#include <Protocol/BlockIo.h>
+#include <Guid/FileInfo.h>
 
 // UINTN ... Unsigned value of native width.
 // gBS ... Global variable representing the boot service.
@@ -132,6 +133,28 @@ EFI_STATUS OpenRootDir(EFI_HANDLE image_handle, EFI_FILE_PROTOCOL** root) {
   return EFI_SUCCESS;
 }
 
+// LocateHandleBuffer ... Retrieve the list of all the handles in the handle database. 
+// @ByProtocol(searche option) ... Retrieve all handles in the handle database that support a specified protocol.
+// @(Specify Protocol) ... .
+// @(???) ...
+// @HandleCount ... The number of handles in the handle database.
+// @HandleBuffer  ... The array of handle values.
+//
+// OpenProtocol
+EFI_STATUS OpenGOP(EFI_HANDLE image_handle,
+                   EFI_GRAPHICS_OUTPUT_PROTOCOL** gop) {
+  UINTN num_gop_handles = 0;
+  EFI_HANDLE* gop_handles = NULL;
+  gBS->LocateHandleBuffer(
+      ByProtocol,
+      &gEfiGraphicsOutputProtocolGuid,
+      NULL,
+      &num_gop_handles,
+      &gop_handles);
+
+  gBS->OpenProtocol(
+
+
 // EFIAPI ...  
 // EFI_HANDLE ... ImageHandle refers to the image handle of the UEFI application. 
 // EFI_SYSTEM_TABLE ... SystemTable is the pointer to the EFI System Table.
@@ -142,7 +165,6 @@ EFI_STATUS OpenRootDir(EFI_HANDLE image_handle, EFI_FILE_PROTOCOL** root) {
 // SaveMemoryMap ... Save memmap to " ~/memmap ".
 // kernel_file->GetInfo() ... EFI_FILE_INFO will be written in file_info_buffer
 // %r ... 
-
 EFI_STATUS EFIAPI UefiMain(
     EFI_HANDLE image_handle,
     EFI_SYSTEM_TABLE* system_table) {
@@ -181,7 +203,7 @@ EFI_STATUS EFIAPI UefiMain(
   EFI_PHYSICAL_ADDRESS kernel_base_addr = 0x100000;
   gBS->AllocatePages(
       AllocateAddress, EfiLoaderData,
-      (kernel_sile_size + 0xfff) / 0x1000, &kernel_base_addr);
+      (kernel_file_size + 0xfff) / 0x1000, &kernel_base_addr);
   kernel_file->Read(kernel_file, &kernel_file_size, (VOID*)kernel_base_addr);
   Print(L"Kernel: 0x%0lx (%lu bytes)\n", kernel_base_addr, kernel_file_size);
   // #@@range_end(read_kernel)
@@ -193,7 +215,7 @@ EFI_STATUS EFIAPI UefiMain(
     status = GetMemoryMap(&memmap);
     if (EFI_ERROR(status)) {
       Print(L"failed to get memory map: %r\n", status);
-      whlie(1);
+      while(1);
     }
     status = gBS->ExitBootServices(image_handle, memmap.map_key);
     if (EFI_ERROR(status)) {
@@ -204,7 +226,11 @@ EFI_STATUS EFIAPI UefiMain(
   // #@@range_end(exit_bs)
 
   // #@@range_begin(call_kernel)
+  UINT64 entry_addr = *(UINT64*)(kernel_base_addr + 24);
 
+  typedef void EntryPointType(void);
+  EntryPointType* entry_point = (EntryPointType*)entry_addr;
+  entry_point();
   // #@@range_end(call_kernel)
 
   Print(L"All done\n");
