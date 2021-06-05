@@ -1,28 +1,3 @@
-# Module Information File.
-# This file describes how the module is coded. 
-# For EDK, this file describes how the component or library is coded 
-# as well as providing some basic build information.
-# One MIF is needed per module.
-
-# [Defines] ... .
-# BASE_NAME ... Component name.
-# ENTRY_POINT ... Name of entry point of this UEFI application.
-# VERSION_STRING ... Used for the VERSION section of the FFS.
-
-# [Sources] ... File names which compose this UEFI application.
-
-# [Packages] ... Package names which will be needed to build this module.
-
-# [LibraryClass] ... Libraries that this app depends on.
-# Theses libraries are the same as the ones defined at LibraryClasses section of Package Describe File.
-
-# [Guids] ... A list of the global GUID C Names that are referenced in the modules code, 
-# but not already referenced in the INF.
-
-# [Protocols] ...  This is a list of the global PROTOCOL C Names that are referenced 
-# in the EDK II Modules C code.
-
-
 [Defines]
   INF_VERSION                    = 0x00010006
   BASE_NAME                      = Loader

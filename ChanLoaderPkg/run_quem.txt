@@ -1,0 +1,44 @@
+shota@DESKTOP-JLLDTTG:~/edk2((HEAD detached at 38c8be123a))$ run_qemu.sh Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
++ [ 1 -lt 1 ]
++ dirname /home/shota/osbook/devenv/run_qemu.sh
++ DEVENV_DIR=/home/shota/osbook/devenv
++ EFI_FILE=Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
++ ANOTHER_FILE=
++ DISK_IMG=./disk.img
++ MOUNT_POINT=./mnt
++ /home/shota/osbook/devenv/make_image.sh ./disk.img ./mnt Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
++ [ 3 -lt 3 ]
++ dirname /home/shota/osbook/devenv/make_image.sh
++ DEVENV_DIR=/home/shota/osbook/devenv
++ DISK_IMG=./disk.img
++ MOUNT_POINT=./mnt
++ EFI_FILE=Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi
++ ANOTHER_FILE=
++ [ ! -f Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi ]
++ rm -f ./disk.img
++ qemu-img create -f raw ./disk.img 200M
+Formatting './disk.img', fmt=raw size=209715200
++ mkfs.fat -n MIKAN OS -s 2 -f 2 -R 32 -F 32 ./disk.img
+mkfs.fat 4.1 (2017-01-24)
++ /home/shota/osbook/devenv/mount_image.sh ./disk.img ./mnt
++ [ 2 -lt 2 ]
++ dirname /home/shota/osbook/devenv/mount_image.sh
++ DEVENV_DIR=/home/shota/osbook/devenv
++ DISK_IMG=./disk.img
++ MOUNT_POINT=./mnt
++ [ ! -f ./disk.img ]
++ mkdir -p ./mnt
++ sudo mount -o loop ./disk.img ./mnt
++ sudo mkdir -p ./mnt/EFI/BOOT
++ sudo cp Build/ChanLoaderX64/DEBUG_CLANG38/X64/Loader.efi ./mnt/EFI/BOOT/BOOTX64.EFI
++ [  !=  ]
++ sleep 0.5
++ sudo umount ./mnt
++ /home/shota/osbook/devenv/run_image.sh ./disk.img
++ [ 1 -lt 1 ]
++ dirname /home/shota/osbook/devenv/run_image.sh
++ DEVENV_DIR=/home/shota/osbook/devenv
++ DISK_IMG=./disk.img
++ [ ! -f ./disk.img ]
++ qemu-system-x86_64 -m 1G -drive if=pflash,format=raw,readonly,file=/home/shota/osbook/devenv/OVMF_CODE.fd -drive if=pflash,format=raw,file=/home/shota/osbook/devenv/OVMF_VARS.fd -drive if=ide,index=0,media=disk,format=raw,file=./disk.img -device nec-usb-xhci,id=xhci -device usb-mouse -device usb-kbd -monitor stdio
+QEMU 4.2.1 monitor - type 'help' for more information

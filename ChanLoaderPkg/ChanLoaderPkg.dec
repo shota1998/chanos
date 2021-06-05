@@ -1,9 +1,3 @@
-# Declaration file.
-# This file declares information about what will be provided in the package. 
-
-# PACKAGE_GUID ... Used by tools for testing dependencies.
-# PACKAGE_VERSON ... Used by tools for testing dependencies.
-
 [Defines]
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = ChanLoaderPkg

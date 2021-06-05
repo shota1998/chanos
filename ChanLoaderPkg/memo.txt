@@ -1,0 +1,55 @@
+ UINTN ... Unsigned value of native width.
+ gBS ... Global variable representing the boot service.
+ gBS->GetMemoryMap ... Get the memory map at the time of the function call.
+  Write the Map to the memory specified by the MemoryMap argument.
+  If the function completes successfully, EFI_SUCCESS is returned.
+
+MemoryMap()----------
+  
+  Paramators
+  1 in: Size of the memory  for memory map writing.
+  1 out: Actual memory size.
+  2: Pointer to the beginning of the memory for memory map writing.
+  3: Memory map identification ID. Changes each time it is updated.
+  4: Size of each memory discriptor. 
+  5: ?
+
+SaveMemoryMap()---------
+
+// AsciiStrLen() ... Returns the length of a Null-terminated ASCII string.
+// EFI_PHYSICAL_ADDRESS ... 64-bit physical memory address.
+// AsciiSPrint ... Like C's "sprintf".
+// desc->Attribute ... Attributes of the memory region that describe the bit mask of capabilities for that memory region, and not necessarily the current settings for that memory region.
+// lu ... unsigned long.
+
+OpenRootDir()---
+
+// EFI_LOADED_IMAGE_PROTOCOL ... Can be used on any image handle to obtain information about the loaded image.
+// EFI_SIMPLE_FILE_SYSTEM_PROTOCOL ... the programmatic access to the FAT (12,16,32) file system specified in 
+//    UEFI 2.0. 
+// gBS->OpenProtocol ... https://edk2-docs.gitbook.io/edk-ii-uefi-driver-writer-s-guide/5_uefi_services/51_services_that_uefi_drivers_commonly_use/513_handle_database_and_protocol_services#example-38-openprotocol-function-prototype
+
+OpenGOP()-----
+
+// LocateHandleBuffer ... Retrieve the list of all the handles in the handle database. 
+// @ByProtocol(searche option) ... Retrieve all handles in the handle database that support a specified protocol.
+// @(Specify Protocol) ... .
+// @(???) ...
+// @HandleCount ... The number of handles in the handle database.
+// @HandleBuffer  ... The array of handle values.
+//
+// OpenProtocol
+
+UefiMain()----
+
+// EFIAPI ...  
+// EFI_HANDLE ... ImageHandle refers to the image handle of the UEFI application. 
+// EFI_SYSTEM_TABLE ... SystemTable is the pointer to the EFI System Table.
+//  L ... Encode wide characters with UCS2.
+//
+// EFI_FILE_PROTOCOL ... Provides file IO access to supported file systems.
+// root_dir->Open ... Make "memmap" file at root dir.
+// SaveMemoryMap ... Save memmap to " ~/memmap ".
+// kernel_file->GetInfo() ... EFI_FILE_INFO will be written in file_info_buffer
+// %r ... 
+
