@@ -6,10 +6,7 @@
 #include "graphics.hpp"
 #include "font.hpp"
 #include "console.hpp"
-
-void* operator new(size_t size, void* buf) {
-  return buf;
-}
+#include "pci.hpp"
 
 void operator delete(void* obj) noexcept {
 }
@@ -112,6 +109,8 @@ extern "C" void KernelMain(const FrameBufferConfig& frame_buffer_config) {
       }
     }
   }
+
+  // auto err = 
 
   while (1) __asm__("hlt");
 }
