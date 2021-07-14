@@ -57,6 +57,30 @@ namespace {
 			return Error::kSuccess;
 		}
 
-		
+		for (uint8_t function = 1; function < 8; ++function) {
+			if (ReadVenderId(bus, device, function) == 0xffffu) {
+				continue;
+			}
+			if (auto err = ScanFunction(bus, device, function)) {
+				return err;
+			}
+		}
+		return Error::kSuccess;
 	}
+
+	Error ScanBus(uint8_t bus) {
+		for (uint8_t device = 0; device < 32; ++device) {
+			if (ReadVenderId(bus, device, 0) == 0xffffu) {
+				continue;
+			}
+			if (auto err = ScanDevice(bus, device)) {
+				return err;
+			}
+		}
+		return Error::kSuccess;
+	}
+}
+
+namespace pci {
+	
 }
