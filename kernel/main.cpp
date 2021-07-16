@@ -110,7 +110,17 @@ extern "C" void KernelMain(const FrameBufferConfig& frame_buffer_config) {
     }
   }
 
-  // auto err = 
+  auto err = pci::ScanAllBus();
+  printk("ScanAllBus: %s\n", err.Name());
+
+  for (int i = 0; i < pci::num_device; ++i) {
+    const auto& dev = pci::devices[i];
+    auto vender_id = pci::ReadVenderId(dev.bus, dev.device, dev.function);
+    auto class_code = pci::ReadClassCode(dev.bus, dev.device, dev.function);
+    printk("%d.%d.%d: vend %04x, class %08x, head%02x\n",
+            dev.bus, dev.device, dev.function,
+            vender_id, class_code, dev.header_type);
+  }
 
   while (1) __asm__("hlt");
 }

@@ -218,7 +218,7 @@ EFI_STATUS EFIAPI UefiMain(
   EFI_FILE_PROTOCOL* root_dir;
   status = OpenRootDir(image_handle, &root_dir);
   if (EFI_ERROR(status)) {
-    Print(L"failed to get memory map: %r\n", status);
+    Print(L"failed to open root directory: %r\n", status);
     Halt();
   }
 
@@ -228,17 +228,17 @@ EFI_STATUS EFIAPI UefiMain(
       EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0);
 
   if (EFI_ERROR(status)) {
-    Print(L"failed to get memory map: %r\n", status);
+    Print(L"failed to open file '\\memmap': %r\n", status);
     Halt();
   } else {
     status = SaveMemoryMap(&memmap, memmap_file);
     if (EFI_ERROR(status)) {
-      Print(L"failed to get memory map: %r\n", status);
+      Print(L"failed to save memory map: %r\n", status);
       Halt();
     }
     status = memmap_file->Close(memmap_file);
     if (EFI_ERROR(status)) {
-      Print(L"failed to get memory map: %r\n", status);
+      Print(L"failed to close memory map: %r\n", status);
       Halt();
     }
   }
@@ -246,7 +246,7 @@ EFI_STATUS EFIAPI UefiMain(
   EFI_GRAPHICS_OUTPUT_PROTOCOL* gop;
   status = OpenGOP(image_handle, &gop);
   if (EFI_ERROR(status)) {
-    Print(L"failed to get memory map: %r\n", status);
+    Print(L"failed to open GOP: %r\n", status);
     Halt();
   }
 
@@ -270,7 +270,7 @@ EFI_STATUS EFIAPI UefiMain(
       root_dir, &kernel_file, L"\\kernel.elf",
       EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR(status)) {
-    Print(L"failed to get memory map: %r\n", status);
+    Print(L"failed to open file '\\kernel.elf': %r\n", status);
     Halt();
   }
 
@@ -281,7 +281,7 @@ EFI_STATUS EFIAPI UefiMain(
       kernel_file, &gEfiFileInfoGuid,
       &file_info_size, file_info_buffer);
   if (EFI_ERROR(status)) {
-    Print(L"failed to get memory map: %r\n", status);
+    Print(L"failed to get file information: %r\n", status);
     Halt();
   }
 
@@ -326,7 +326,7 @@ EFI_STATUS EFIAPI UefiMain(
   if (EFI_ERROR(status)) {
     status = GetMemoryMap(&memmap);
     if (EFI_ERROR(status)) {
-      Print(L"failed to get memory map: %r\n", status);
+      Print(L"failed to get memory map 9: %r\n", status);
       Halt();
     }
     status = gBS->ExitBootServices(image_handle, memmap.map_key);

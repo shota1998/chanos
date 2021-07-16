@@ -1,14 +1,11 @@
-main.o: main.cpp \
+pci.o: pci.cpp pci.hpp \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/cstdint \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/__config \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/stdint.h \
-  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/cstddef \
-  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/version \
-  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/cstdio \
-  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/stdio.h \
-  frame_buffer_config.hpp graphics.hpp font.hpp console.hpp pci.hpp \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/array \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/__tuple \
+  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/cstddef \
+  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/version \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/type_traits \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/utility \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/initializer_list \
@@ -33,4 +30,5 @@ main.o: main.cpp \
   /home/shota/osbook/devenv/x86_64-elf/include/assert.h \
   /home/shota/osbook/devenv/x86_64-elf/include/_ansi.h \
   /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/functional \
-  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/bit error.hpp
+  /home/shota/osbook/devenv/x86_64-elf/include/c++/v1/bit error.hpp \
+  asmfunc.h
