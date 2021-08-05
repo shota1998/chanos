@@ -2,3 +2,6 @@
 .vscode
 disk.img
 mnt
+*.img
+*.o
+*.d
